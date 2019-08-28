@@ -1,0 +1,8 @@
+Nome: Windows 10 Enterprise x64 Build 1809
+
+Versão: WXE.64.1809.9.190228
+
+Descrição: Imagem Windows 10 padrão com drivers dos modelos homologados.
+
+Observações:----------.
+

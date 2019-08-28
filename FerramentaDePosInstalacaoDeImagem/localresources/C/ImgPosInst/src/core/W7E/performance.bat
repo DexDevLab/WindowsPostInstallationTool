@@ -1,0 +1,8 @@
+COPY C:\ImgPosInst\src\misc\run.lnk "C:\Users\Default\AppData\Roaming" 
+COPY "C:\ImgPosInst\src\misc\Meu IP.lnk" "C:\Users\Default\AppData\Roaming" 
+COPY C:\ImgPosInst\src\misc\W7E\apply.bat "C:\Users\Default\AppData\Roaming" 
+COPY C:\ImgPosInst\src\misc\W7E\version.txt "C:\Users\Default\AppData\Roaming" 
+COPY C:\ImgPosInst\src\misc\MeuIP.jar "C:\Users\Default\AppData\Roaming" 
+COPY C:\ImgPosInst\src\misc\oemlogo.png "C:\Users\Default\AppData\Roaming" 
+COPY C:\ImgPosInst\src\misc\run.lnk "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp" 
+COPY "C:\ImgPosInst\src\misc\Meu IP.lnk" "C:\Users\Default\Desktop"

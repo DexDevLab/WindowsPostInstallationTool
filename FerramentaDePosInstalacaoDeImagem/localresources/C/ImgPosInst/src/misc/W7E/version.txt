@@ -1,0 +1,8 @@
+Nome: Windows 7 Enterprise x64 Service Pack 1
+
+Versão: W7E.64.SP1.3.190308
+
+Descrição: Imagem Windows 7 padrão com drivers dos modelos homologados.
+
+Observações:----------.
+

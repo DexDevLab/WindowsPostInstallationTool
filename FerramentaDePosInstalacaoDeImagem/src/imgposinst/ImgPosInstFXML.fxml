@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="imgposinst.ImgPosInstFXMLController">
+    <children>
+        <Label alignment="CENTER" layoutX="290.0" layoutY="9.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="229.0" text="Selecione a Marca/Modelo">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="543.0" layoutY="9.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="176.0" text="Selecione a Unidade" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="buttoniniciar" layoutX="357.0" layoutY="337.0" mnemonicParsing="false" onAction="#acaobuttoniniciar" prefHeight="31.0" prefWidth="88.0" text="Iniciar">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <ProgressIndicator fx:id="progressbar" layoutX="367.0" layoutY="466.0" prefHeight="61.0" prefWidth="66.0" />
+      <Label fx:id="labelstatus" alignment="CENTER" layoutX="137.0" layoutY="536.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="535.0" textAlignment="CENTER" wrapText="true">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="comboboxmachine" layoutX="325.0" layoutY="55.0" prefHeight="25.0" prefWidth="150.0" />
+      <ComboBox fx:id="comboboxsite" layoutX="521.0" layoutY="55.0" prefHeight="25.0" prefWidth="219.0" />
+      <Label fx:id="labelstatus2" alignment="CENTER" contentDisplay="CENTER" layoutX="45.0" layoutY="393.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="713.0" style="-fx-background-color: yellow;" text="NÃO DESLIGUE OU REINICIE O COMPUTADOR ATÉ O FIM DO PROCESSO." textAlignment="CENTER" textFill="#eb0909" visible="false" wrapText="true">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="263.0" layoutY="121.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="276.0" text="Credenciais do Técnico" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="25.0" />
+         </font>
+      </Label>
+      <TextField fx:id="textfielduser" alignment="CENTER" disable="true" layoutX="327.0" layoutY="210.0" />
+      <PasswordField fx:id="passwordfieldpass" alignment="CENTER" disable="true" layoutX="327.0" layoutY="273.0" />
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="345.0" layoutY="170.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="112.0" text="ID de Usuário" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="345.0" layoutY="234.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="112.0" text="Senha" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="53.0" layoutY="9.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="219.0" text="Selecione o Equipamento">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="comboboxmachinetype" layoutX="87.0" layoutY="55.0" prefHeight="25.0" prefWidth="150.0" />
+    </children>
+</AnchorPane>
