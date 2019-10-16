@@ -1,1 +1,0 @@
-changepk.exe /ProductKey WXXXX-TXXXX-7XXXX-TXXXX-JXXXX
