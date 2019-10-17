@@ -2,6 +2,8 @@
 if not "%1" == "min" start /MIN cmd /c %0 min & exit/b
 mode con: cols=10 lines=5
 DEL /Q /F "C:\deploy.bat" >NUL 2>&1
+DEL /Q /F "C:\ImgPosInst\src\core" >NUL 2>&1
+DEL /Q /F "C:\ImgPosInst\src\misc" >NUL 2>&1
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM" /v AlwaysHibernateThumbnails /t REG_DWORD /d 0 /f >NUL 2>&1
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM" /v EnableAeroPeek /t REG_DWORD /d 1 /f >NUL 2>&1
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 2 /f >NUL 2>&1

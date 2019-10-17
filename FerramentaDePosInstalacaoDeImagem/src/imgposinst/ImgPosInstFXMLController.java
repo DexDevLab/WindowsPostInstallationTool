@@ -4,11 +4,11 @@
 package imgposinst;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,14 +30,21 @@ import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import static org.apache.commons.io.FileUtils.*;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.LineIterator;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 
 /**
  * @author Daniel Augusto Monteiro de Almeida
  * @since 27/05/2019
- * @version 1.0.2-20190828-22
+ * @version 2.0.0-20191017-24
+ * 
+ * Changelog:
+ * - New method for load script file
+ * - New method for execute commands by script line
+ * - New command for installing independent video driver
+ * - Excluded commanding for delete temporary files and
+ * included into initialization windows batch (apply.bat)
+ * - Method doCommands() removed
  * 
  * Main Class. Implements interface.
  */
@@ -63,59 +70,32 @@ public class ImgPosInstFXMLController implements Initializable
   /** Line separator for text concatenation. */
   final String line = System.getProperty("line.separator");
   
+  File corefile = new File ("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "core.cfg");
   
-  //----------------------------------------------------------------
-  // CMD script files and related variables.
-  // (In future, this will be changed to a single JSON file.)
-  // Note: At first, I used CMD script files (.cfg) but I needed to change it
-  // to batch files (.bat) because I was encountering many errors while running
-  // the commands. The intention is to use a single JSON file at future.
-  //----------------------------------------------------------------
+  //------------------------------------------------------------------
+  // List variables containing corefile entries
+  //------------------------------------------------------------------
+  List<String> machinetypelist; //Machines type List
+  List<String> machinelist; //Machines model list
+  List<String> sitelist; //Site list
+  List<String> IPs; //IP Address list for Domain connection test
+  List<String> SEPlist; //SEP Antivirus commands list
+  List<String> powerplan; //Power Plan adjust commands list
+  List<String> services; //Services tweaks commands list
+  List<String> remotecon; //Remote Connection adjust list
+  List<String> winstore; //Windows Store command list
+  List<String> performance; //General tweaks command list
+  List<String> O365; //Office 365 ajusts command list
+  List<String> activation; //Windows Activation commands
   
-  /** 
-   * File cointaining list of Computer models listed on ComboBox.
-   * @see #comboboxmachine
-   */
-  File machinelistfile = new File ("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "machinelist.cfg");
-  /** 
-   * File cointaining list of Computer types listed on ComboBox.
-   * @see #comboboxmachinetype
-   */
-  File machinetypelistfile = new File ("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "machinetype.cfg");
-  /** 
-   * File cointaining list of sites (Facilities, Offices etc) listed on ComboBox.
-   * @see #comboboxsite
-   */
-  File sitelistfile = new File ("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "sitelist.cfg");
   /** Driver files root directory. */
   File drvroot;
   /** Zip file cointaining drivers. */
   File zipdrvfile;
-  /** Power Plan adjust script file. */
-//  File powerplan;
-  /** Windows Services adjustments script file. */
-//  File services;
-/** Remote Connections tweaks script file. */
-//  File remotecon;
-/** Windows Store and App Shortcuts disablement script file. */
-//  File windowsstore;
-/** Performance settings, custom programs and other deployments script file. */
-//  File performance;
-/** Office 365 automatic updates disablement script file. */
-//  File o365;
-/** Windows Activation script file. */
-//  File activation;
-  
   /** String containing AlertBox Message. */
   String message;
-  /** IP Address for Domain verification. */
-  String ip1 = "10.102.13.9";
-  /** IP Address for Domain verification. */
-  String ip2 = "10.102.13.8";
-  /** IP Address for Domain verification. */
-  String ip3 = "172.17.29.58";
   /* Confirm if computer has connection to Domain. */
-  boolean domainconnected = false;
+  boolean domainconnected;
   /** Gets OS version. */
   String osver;
   /** Gets technician user ID logged. */
@@ -236,7 +216,7 @@ public class ImgPosInstFXMLController implements Initializable
   @FXML
   void acaobuttoniniciar() throws IOException 
   {
-    try {log(null, "INFO", "Botão pressionado");} catch (FileNotFoundException e){}
+    log(null, "INFO", "Botão pressionado");
     
     buttoniniciar.setDisable(true);
     comboboxsite.setDisable(true);
@@ -268,7 +248,7 @@ public class ImgPosInstFXMLController implements Initializable
       Thread Thread1 = new Thread (new MainTask());
       Thread1.setDaemon(true);
       Thread1.start();
-      try {log(null, "INFO", "Iniciando Thread1 - MainTask");} catch (FileNotFoundException e){}
+      log(null, "INFO", "Iniciando Thread1 - MainTask");
     }
   }
   
@@ -278,17 +258,61 @@ public class ImgPosInstFXMLController implements Initializable
    * @param throwable - exception throwable (if necessary)
    * @param logtype - "INFO" for common info and "ERRO" for errors
    * @param logmsg - The message to be written/logged into file
-   * @throws IOException - If encounters errors while manipulating the log file
    */
-  public void log (Throwable throwable, String logtype, String logmsg) throws IOException
+  public void log (Throwable throwable, String logtype, String logmsg)
   {
     time = df.format(Calendar.getInstance().getTime());
     logtype = "[" + logtype + "]: ";
     if (throwable != null) { logmsg = (line + logmsg + line + getStackTrace(throwable)); }
     System.out.println(time + logtype + logmsg);
-    writeStringToFile(logfile, time + logtype + logmsg + line, "UTF-8", true);
+    try
+    {
+      writeStringToFile(logfile, time + logtype + logmsg + line, "UTF-8", true);
+    } 
+    catch (IOException ex) { System.out.println("ERRO CRÍTICO AO GERAR O LOG."); }
   }
   
+  /**
+   * Load a defined Script File and put values into a list, choosing
+   * the line ranges.
+   * 
+   * @param scriptfil - the script file
+   * @param startlin - the first line to read. In file, line 2 means
+   * startlin = 2
+   * @param endlin - the last line to read. For single line reading, use
+   * in endlin the same value as startlin
+   */
+  public List<String> loadScript(File scriptfil, int startlin, int endlin)
+  {
+    List<String> lis = null;
+    while (startlin <= endlin)
+    {
+      try { lis.add(Files.readAllLines(scriptfil.toPath()).get(startlin)); }
+      catch (IOException ex) { log(ex, "ERRO", "EXCEÇÃO EM loadScript(File, int, int): NÃO FOI POSSÍVEL INCLUIR A LINHA " + startlin + " NA LISTA."); }
+      startlin++;
+    }
+    return lis;
+  }
+  
+  /**
+   * Perform Process Builder CMD line by a list.
+   * 
+   * @param list - the list to read
+   */
+  public void runCMD (List<String> list)
+  {
+    list.forEach((cmdlin) ->
+    {
+      try
+      {
+        log(null, "INFO", "Executando comando " + cmdlin);
+        new ProcessBuilder("cmd", "/c", cmdlin).start();
+        Thread.sleep(500);
+      } 
+      catch (IOException ex) { log(ex, "ERRO", "EXCEÇÃO EM runCMD(String<List>) - COMANDO " + cmdlin + " INVÁLIDO OU FALHA CRÍTICA DO CMD."); }
+      catch (InterruptedException ex2) { log(ex2, "ERRO", "EXCEÇÃO EM runCMD(String<List>) - THREAD INTERROMPIDA DE MANEIRA INESPERADA."); }
+    });
+  }
   
   /**
    * Move, copy, or delete a File object, writing to a log.
@@ -309,12 +333,12 @@ public class ImgPosInstFXMLController implements Initializable
       {
         if (source.exists())
         {
-          try {log(null, "INFO", a + " \"" + source.toString()+ " encontrado(a)");} catch (IOException ex){}
+          log(null, "INFO", a + " \"" + source.toString()+ " encontrado(a)");
           FileUtils.deleteQuietly(source);
-          if (!source.exists()){try{log(null, "INFO", a + " \"" + source.toString() + " " + operation);} catch (IOException ex){}}
+          if (!source.exists()){log(null, "INFO", a + " \"" + source.toString() + " " + operation);}
         }
-        else if (!source.exists()) {try {log(null, "INFO", a + " \"" + source.toString() + "\" não foi encontrado(a)");} catch (IOException ex){}}
-        if (source.exists()) {try {log (null, "ERRO", a + " \"" + source.toString() + "\" AINDA EXISTE");} catch (IOException ex){}}
+        else if (!source.exists()) {log(null, "INFO", a + " \"" + source.toString() + "\" não foi encontrado(a)"); }
+        if (source.exists()) {log (null, "ERRO", a + " \"" + source.toString() + "\" AINDA EXISTE"); }
       }
       else
       {
@@ -335,7 +359,7 @@ public class ImgPosInstFXMLController implements Initializable
         log(null, "INFO", a + " \"" + source.toString() + "\" " + operation + " para \"" + destination.toString() + "\"");
       }
     }
-    else {{try {log (null, "ERRO", a + " \"" + source.toString() + "\" NÃO FOI ENCONTRADO.");} catch (IOException ex){}}}
+    else {{log (null, "ERRO", a + " \"" + source.toString() + "\" NÃO FOI ENCONTRADO.");}}
   }
   
   /**
@@ -347,7 +371,82 @@ public class ImgPosInstFXMLController implements Initializable
   @Override
   public void initialize(URL url, ResourceBundle rb)
   {
-    try {log(null, "INFO", "Logger inicializado. Janela aberta.");} catch (FileNotFoundException ex) {try {log(null, "ERRO", "FALHA AO INICIALIZAR log()");} catch (IOException ex1){}} catch (IOException ex){}
+    log(null, "INFO", "Logger inicializado. Janela aberta.");
+    log(null, "INFO", "Checando Sistema Operacional...");
+    ProcessBuilder os = new ProcessBuilder("cmd", "/c", "ver");
+    String osget = null;
+    try { osget = IOUtils.toString(os.start().getInputStream(), "UTF-8"); }
+    catch (IOException ex)
+    {
+      log(ex, "ERRO", "EXCEÇÃO EM initialize(URL, ResourceBundle) - NÃO FOI POSSÍVEL VERIFICAR O SISTEMA OPERACIONAL.");
+      Platform.exit();
+    }
+    if (osget.contains("Microsoft Windows [versão 10") | osget.contains("Microsoft Windows [vers�o 10"))
+    {
+      osver = "WXE";
+      log(null, "INFO", osget);
+      log(null, "INFO", "Windows 10 Enterprise");
+    } 
+    else 
+    {
+      osver = "W7E";
+      log(null, "INFO", osget);
+      log(null, "INFO", "Windows 7 Enterprise");
+    }
+    if (!corefile.exists()) 
+    { 
+      log(null, "ERRO", "COREFILE NÃO ENCONTRADO. A FERRAMENTA PÓS-INSTALAÇÃO NÃO IRÁ FUNCIONAR CORRETAMENTE!"); 
+      Platform.exit();
+    }
+    else
+    {
+      log(null, "INFO", "Registrando variáveis de acordo com o Corefile...");
+      log(null, "INFO", "Carregando lista de tipos de equipamento...");
+      machinetypelist = loadScript(corefile, 70, 71);
+      log(null, "INFO", "Carregando lista de modelos de equipamento...");
+      machinelist = loadScript(corefile, 75, 83);
+      log(null, "INFO", "Carregando lista de Unidades Lactalis...");
+      sitelist = loadScript(corefile, 14, 65);
+      log(null, "INFO", "Carregando lista de Endereços IP para teste de rede...");
+      IPs = loadScript(corefile, 560, 560);
+      log(null, "INFO", "Carregando lista de comandos SEP...");
+      SEPlist = loadScript(corefile, 555, 555);
+      log(null, "INFO", "Carregando lista de comandos de ajuste de Perfil de Energia...");
+      if ("W7E".equals(osver)) 
+      { 
+        powerplan = loadScript(corefile, 127, 184);
+      }
+      else if ("WXE".equals(osver))
+      {
+        powerplan = loadScript(corefile, 120, 122);
+      }
+      log(null, "INFO", "Carregando lista de comandos de ajustes dos Serviços do Windows...");
+      if ("W7E".equals(osver)) 
+      { 
+        services = loadScript(corefile, 398, 545);
+      }
+      else if ("WXE".equals(osver))
+      {
+        services = loadScript(corefile, 194, 393);
+      }
+      log(null, "INFO", "Carregando lista de comandos de ajustes para Conexão remota...");
+      remotecon = loadScript(corefile, 189, 189);
+      log(null, "INFO", "Carregando lista de comandos de ajustes para a Windows Store...");
+      winstore = loadScript(corefile, 550, 550);
+      log(null, "INFO", "Carregando lista de comandos de ajustes de performance...");
+      performance = loadScript(corefile, 108, 115);
+      log(null, "INFO", "Carregando lista de comandos de ajustes do Office 365...");
+      O365 = loadScript(corefile, 98, 103);
+      log(null, "INFO", "Carregando lista de comandos de ativação do Windows..");
+       if ("W7E".equals(osver)) 
+      { 
+        activation = loadScript(corefile, 93, 93);
+      }
+      else if ("WXE".equals(osver))
+      {
+        activation = loadScript(corefile, 88, 88);
+      }
+    }
     
     progressbar.setVisible(false);
     labelstatus.setVisible(false);
@@ -361,91 +460,76 @@ public class ImgPosInstFXMLController implements Initializable
     textfielduser.setTooltip(new Tooltip("Insira o ID do técnico autorizado."));
     passwordfieldpass.setTooltip(new Tooltip("Insira a senha do técnico autorizado."));
     
-    try
+    comboboxmachinetype.getItems().addAll(machinetypelist);
+    comboboxmachinetype.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>()
     {
-      List<String> machinetypelist = FileUtils.readLines(machinetypelistfile, "UTF-8");
-      comboboxmachinetype.getItems().addAll(machinetypelist);
-      comboboxmachinetype.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() 
-      { 
-
-        @Override
-        public void changed(ObservableValue ov, Number value, Number new_value) 
-        {
-          machinetype = comboboxmachinetype.getItems().get((int) new_value);
-          try {log(null, "INFO", "Tipo de Equipamento \"" + machinetype + "\" de ID " + new_value.intValue() + " selecionado");} catch (FileNotFoundException ex){} catch (IOException ex){}
-          if (new_value.intValue() == 0){machinetag = "D";}
-          else if (new_value.intValue() == 1){machinetag = "N";}
-          System.out.println(machinetag);
-          comboboxmachine.setDisable(false);
-        }
-      });
-      List<String> machinelist = FileUtils.readLines(machinelistfile, "UTF-8");
-      comboboxmachine.getItems().addAll(machinelist);
-      comboboxmachine.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() 
-      { 
-
-        @Override
-        public void changed(ObservableValue ov, Number value, Number new_value) 
-        {
-          machinevalue = comboboxmachine.getItems().get((int) new_value);
-          try {log(null, "INFO", "Equipamento \"" + machinevalue + "\" de ID " + new_value.intValue() + " selecionado");} catch (FileNotFoundException ex){} catch (IOException ex){}
-          if ((new_value.intValue()) == 0) {installdrivers = false;}
-          comboboxsite.setDisable(false);
-        }
-      });
-      List<String> sitelist = FileUtils.readLines(sitelistfile, "UTF-8");
-      comboboxsite.getItems().addAll(sitelist);
-      comboboxsite.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() 
+      
+      @Override
+      public void changed(ObservableValue ov, Number value, Number new_value) 
       {
-
-        @Override
-        public void changed(ObservableValue ov, Number value, Number new_value) 
-        {
-          sitevalue = comboboxsite.getItems().get((int) new_value);
-          if (sitevalue.contains("("))
-          {
-            int startIndex1 = sitevalue.indexOf("(");
-            int endIndex1 = sitevalue.indexOf(")");
-            hostprefix = sitevalue.substring(startIndex1+1, endIndex1);
-            {try {log (null, "INFO", "Prefixo da Unidade/Site: " + hostprefix);} catch (IOException ex){}}
-          }
-          else
-          {
-            hostprefix = "Nenhum";
-            {try {log (null, "INFO", "Não foi escolhida uma Unidade/Site");} catch (IOException ex){}}
-          }
-          try {log(null, "INFO", "Unidade \"" + sitevalue + "\" de ID " + new_value.intValue() + " selecionada");} catch (FileNotFoundException ex){} catch (IOException ex){}
-          buttoniniciar.setDisable(false);
-          textfielduser.setDisable(false);
-          passwordfieldpass.setDisable(false);
-        }
-      });
-      log(null, "INFO", "Checando Sistema Operacional...");
-      ProcessBuilder os = new ProcessBuilder("cmd", "/c", "ver");
-      String osget = IOUtils.toString(os.start().getInputStream(), "UTF-8");
-      if (osget.contains("Microsoft Windows [versão 10") | osget.contains("Microsoft Windows [vers�o 10"))
-      {
-        osver = "WXE";
-        log(null, "INFO", osget);
-        log(null, "INFO", "Windows 10 Enterprise");
-      } 
-      else 
-      {
-        osver = "W7E";
-        log(null, "INFO", osget);
-        log(null, "INFO", "Windows 7 Enterprise");
+        machinetype = comboboxmachinetype.getItems().get((int) new_value);
+        log(null, "INFO", "Tipo de Equipamento \"" + machinetype + "\" de ID " + new_value.intValue() + " selecionado");
+        if (new_value.intValue() == 0){machinetag = "D";}
+        else if (new_value.intValue() == 1){machinetag = "N";}
+        System.out.println(machinetag);
+        comboboxmachine.setDisable(false);
       }
-      log(null, "INFO", "Checando conexão com o Domínio...");
-      domainconnected = (testConnect(ip1) == true) && (testConnect(ip2) == true) && (testConnect(ip3) == true);
-      if (domainconnected == false)
+    });
+
+    comboboxmachine.getItems().addAll(machinelist);
+    comboboxmachine.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>()
+    {
+
+      @Override
+      public void changed(ObservableValue ov, Number value, Number new_value)
       {
-        message = "nonetwork";
-        log(null, "ERRO", "NÃO HÁ CONEXÃO DE REDE OU O DOMÍNIO NÃO PODE SER ACESSADO.");
-        FutureTask<String> nonetwork = new FutureTask<>(new Dialog());
-        Platform.runLater(nonetwork);
+        machinevalue = comboboxmachine.getItems().get((int) new_value);
+        log(null, "INFO", "Equipamento \"" + machinevalue + "\" de ID " + new_value.intValue() + " selecionado");
+        if ((new_value.intValue()) == 0) {installdrivers = false;}
+        comboboxsite.setDisable(false);
       }
+    });
+
+    comboboxsite.getItems().addAll(sitelist);
+    comboboxsite.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>()
+    {
+
+      @Override
+      public void changed(ObservableValue ov, Number value, Number new_value)
+      {
+        sitevalue = comboboxsite.getItems().get((int) new_value);
+        if (sitevalue.contains("("))
+        {
+          int startIndex1 = sitevalue.indexOf("(");
+          int endIndex1 = sitevalue.indexOf(")");
+          hostprefix = sitevalue.substring(startIndex1+1, endIndex1);
+          { log (null, "INFO", "Prefixo da Unidade/Site: " + hostprefix);}
+        }
+        else
+        {
+          hostprefix = "Nenhum";
+          { log (null, "INFO", "Não foi escolhida uma Unidade/Site");}
+        }
+        log(null, "INFO", "Unidade \"" + sitevalue + "\" de ID " + new_value.intValue() + " selecionada");
+        buttoniniciar.setDisable(false);
+        textfielduser.setDisable(false);
+        passwordfieldpass.setDisable(false);
+      }
+    });
+    
+    log(null, "INFO", "Checando conexão com o Domínio...");
+    IPs.forEach((list) ->
+    {
+      try { domainconnected = testConnect(list); }
+      catch (IOException ex) { log(ex, "ERRO", "EXCEÇÃO EM initialize(URL, ResourceBundle) - NÃO FOI POSSÍVEL REALIZAR O TESTE DE REDE COM O ENDEREÇO " + list); }
+    });
+    if (domainconnected == false)
+    {
+      message = "nonetwork";
+      log(null, "ERRO", "NÃO HÁ CONEXÃO DE REDE OU O DOMÍNIO NÃO PODE SER ACESSADO.");
+      FutureTask<String> nonetwork = new FutureTask<>(new Dialog());
+      Platform.runLater(nonetwork);
     }
-    catch (IOException ex){ try {log(ex, "ERRO", "ARQUIVOS NÃO ENCONTRADOS OU ENTRADA INVÁLIDA NA LISTA.");} catch (IOException ex1){} }
   }
   
   /**
@@ -458,30 +542,8 @@ public class ImgPosInstFXMLController implements Initializable
     Platform.runLater(() -> 
     {
       labelstatus.setText(text);
-      try {log(null, "INFO", text);} catch (IOException ex1){}
+      log(null, "INFO", text);
     });
-  }
-
-  /**
-   * Run DOS command contained in script file.
-   * 
-   * @param scriptfile - the script file containing commands
-   * @throws java.io.IOException
-   * @throws java.lang.InterruptedException
-   */
-  public void doCommands(File scriptfile) throws IOException, InterruptedException
-  {
-    short id = 0;
-    LineIterator it = FileUtils.lineIterator(scriptfile, "UTF-8");
-    while (it.hasNext()) 
-    {
-      id += 1;
-      String cmdline = it.nextLine();
-      log(null, "INFO", "Processando comando " + cmdline + " na linha " + id + " do arquivo de script " + scriptfile.getName());
-      new ProcessBuilder("cmd", "/c", cmdline).start();
-    }
-    Thread.sleep(500);
-    changeStatus("Concluído.");
   }
   
   /**
@@ -489,7 +551,6 @@ public class ImgPosInstFXMLController implements Initializable
    * 
    * @param ip - IP for queue
    * @throws UnknownHostException when the address can not be reached
-   * @throws IOException when log cannot be written.
    * @return false when there is not connection with IP
    */
   public boolean testConnect(String ip) throws UnknownHostException, IOException
@@ -566,47 +627,49 @@ public class ImgPosInstFXMLController implements Initializable
         Thread.sleep(500);
         changeStatus("Instalando o Symantec Endpoint Protection. Aguarde...");
         Thread.sleep(500);
-        new ProcessBuilder("cmd", "/c", "sep.bat >NUL").directory(new File("C:\\ImgPosInst\\src\\core")).start();
+        runCMD(SEPlist);
         Thread.sleep(300000);
         changeStatus("Concluído");
         Thread.sleep(500);
         changeStatus("Ajustando perfil de Energia...");
-        new ProcessBuilder("cmd", "/c", "powerplan.bat >NUL").directory(new File("C:\\ImgPosInst\\src\\core\\" + osver)).start();
+        runCMD(powerplan);
         Thread.sleep(500);
         changeStatus("Configurando Serviços...");
-        new ProcessBuilder("cmd", "/c", "services.bat >NUL").directory(new File("C:\\ImgPosInst\\src\\core\\" + osver)).start();
+        runCMD(services);
         Thread.sleep(500);
         changeStatus("Ajustando Configurações de Acesso Remoto...");
-        new ProcessBuilder("cmd", "/c", "windowsstore.bat >NUL").directory(new File("C:\\ImgPosInst\\src\\core\\" + osver)).start();
+        runCMD(remotecon);
         Thread.sleep(500);
         if ("WXE".equals(osver))
         {
           changeStatus("Desativando a Windows Store...");
-          new ProcessBuilder("cmd", "/c", "windowsstore.bat >NUL").directory(new File("C:\\ImgPosInst\\src\\core\\" + osver)).start();
+          runCMD(winstore);
         }
         changeStatus("Realizando ajustes de performance...");
-        new ProcessBuilder("cmd", "/c", "performance.bat >NUL").directory(new File("C:\\ImgPosInst\\src\\core\\" + osver)).start();
+        runCMD(performance);
         Thread.sleep(500);
         changeStatus("Configurando o Office 365...");
-        new ProcessBuilder("cmd", "/c", "o365.bat >NUL").directory(new File("C:\\ImgPosInst\\src\\core\\" + osver)).start();
+        runCMD(O365);
         Thread.sleep(500);
-        drvroot = new File ("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "DRV");
+        drvroot = new File ("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + osver);
         if (installdrivers == true)
         {
           changeStatus("Listando drivers a serem instalados...");
           machinevalue = machinevalue.replaceAll("\\s", "");
           log(null, "INFO", "Diretório de driver selecionado: " + machinevalue);
-          File drvdir = new File(drvroot + File.separator + osver + File.separator + machinevalue);
+          File drvdir = new File(drvroot + File.separator + "DRV" + File.separator + machinevalue);
           zipdrvfile = new File (drvdir + File.separator + "zip.zip");
           ZipFile zipdrv = new ZipFile(drvdir + File.separator + "zip.zip");
           changeStatus("Descompactando os arquivos necessários...");
           zipdrv.extractAll(drvdir.toString());
           log(null, "INFO","Arquivo de pacote de driver extraído");
           changeStatus("Iniciando instalação de driver. Aguarde...");
-          try {FileIOAndLog("copiado", new File (drvroot + File.separator + osver + File.separator + "pnputil.exe"), new File(drvdir + File.separator + "pnputil.exe"));} catch (IOException ex){}
-          try {FileIOAndLog("copiado", new File (drvroot + File.separator + osver + File.separator + "drv.bat"), new File(drvdir + File.separator + "drv.bat"));} catch (IOException ex){}
+          try {FileIOAndLog("copiado", new File (drvroot + File.separator + "DRV" + File.separator + "pnputil.exe"), new File(drvdir + File.separator + "pnputil.exe"));} catch (IOException ex){}
+          try {FileIOAndLog("copiado", new File (drvroot + File.separator + "DRV" + File.separator + "drv.bat"), new File(drvdir + File.separator + "drv.bat"));} catch (IOException ex){}
           new ProcessBuilder("cmd", "/c", "drv.bat >NUL").directory(drvdir).start();
-          Thread.sleep(300000);
+          Thread.sleep(180000);
+          new ProcessBuilder("cmd", "/c", "video\\igxpin.exe -s").directory(drvdir).start();
+          Thread.sleep(180000);
           log(null, "INFO","Comando recursivo concluído");
         }
         Thread.sleep(500);
@@ -614,7 +677,7 @@ public class ImgPosInstFXMLController implements Initializable
         Thread.sleep(500);
         changeStatus("Ativando o Windows...");
         Thread.sleep(500);
-        new ProcessBuilder("cmd", "/c", "activation.bat").directory(new File("C:\\ImgPosInst\\src\\core\\" + osver)).start();
+        runCMD(activation);
         if (domainconnected == true)
         {
           changeStatus("Inserindo Máquina ao Domínio...");
@@ -644,15 +707,11 @@ public class ImgPosInstFXMLController implements Initializable
           Thread.sleep(15000);
         }
         changeStatus("Concluindo e Reiniciando...");
-        Thread.sleep(1000);
-        try {FileIOAndLog("excluído", new File ("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "SEP"), null);} catch (IOException ex){}
-        if (installdrivers == true) { try {FileIOAndLog("excluído", zipdrvfile, null);} catch (IOException ex){} }
-        try {FileIOAndLog("excluído", drvroot, null);} catch (IOException ex){}
         new ProcessBuilder("cmd", "/c", "shutdown -r -t 3").start();
         Thread.sleep(1000);
-        try {log(null, "INFO", "Thread1 finalizada");} catch (FileNotFoundException e){}
+        log(null, "INFO", "Thread1 finalizada");
       }
-      catch (InterruptedException x){try {log (x, "ERRO","THREAD INTERROMPIDA");} catch (IOException ex){}} catch (IOException |ZipException ex){}
+      catch (InterruptedException x){log (x, "ERRO","THREAD INTERROMPIDA");} catch (IOException |ZipException ex){}
     }
   }
 }
