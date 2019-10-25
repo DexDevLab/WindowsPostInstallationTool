@@ -39,7 +39,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 /**
  * @author Daniel Augusto Monteiro de Almeida
  * @since 07/25/2019
- * @version 2.0.0-20191025-26
+ * @version 2.0.1-20191025-27
  *
  * Main Class. Implements interface.
  */
@@ -81,11 +81,11 @@ public class ImgPosInstFXMLController implements Initializable
   /**
    * Corefile containing all info about UI and custom tweaks for the System.
    */
-  File corefile = new File("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "core.cfg");
+  File corefile = new File("C:" + File.separator + "ImgPosInst" + File.separator + "core.cfg");
   /**
    * File containing the powershell commands to include machine to Domain.
    */
-  File pshellfile = new File("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "core.ps1");
+  File pshellfile = new File("C:" + File.separator + "ImgPosInst" + File.separator + "core.ps1");
   //------------------------------------------------------------------
   // List variables containing corefile entries
   //------------------------------------------------------------------
@@ -516,33 +516,40 @@ public class ImgPosInstFXMLController implements Initializable
       log(null, "INFO", "Carregando lista de Unidades Lactalis...");
       sitelist = loadScript(corefile, 14, 65);
       log(null, "INFO", "Carregando lista de Endereços IP para teste de rede...");
-      IPs = loadScript(corefile, 560, 560);
+      IPs = loadScript(corefile, 572, 572);
       log(null, "INFO", "Carregando lista de comandos SEP...");
-      SEPlist = loadScript(corefile, 555, 555);
+      SEPlist = loadScript(corefile, 567, 567);
       log(null, "INFO", "Carregando lista de comandos de ajuste de Perfil de Energia...");
       if ("W7E".equals(osver))
       {
-        powerplan = loadScript(corefile, 127, 184);
+        powerplan = loadScript(corefile, 139, 196);
       }
       else if ("WXE".equals(osver))
       {
-        powerplan = loadScript(corefile, 120, 122);
+        powerplan = loadScript(corefile, 132, 134);
       }
       log(null, "INFO", "Carregando lista de comandos de ajustes dos Serviços do Windows...");
       if ("W7E".equals(osver))
       {
-        services = loadScript(corefile, 398, 545);
+        services = loadScript(corefile, 410, 557);
       }
       else if ("WXE".equals(osver))
       {
-        services = loadScript(corefile, 194, 393);
+        services = loadScript(corefile, 206, 405);
       }
       log(null, "INFO", "Carregando lista de comandos de ajustes para Conexão remota...");
-      remotecon = loadScript(corefile, 189, 189);
+      remotecon = loadScript(corefile, 201, 201);
       log(null, "INFO", "Carregando lista de comandos de ajustes para a Windows Store...");
-      winstore = loadScript(corefile, 550, 550);
+      winstore = loadScript(corefile, 562, 562);
       log(null, "INFO", "Carregando lista de comandos de ajustes de performance...");
-      performance = loadScript(corefile, 108, 115);
+      if ("W7E".equals(osver))
+      {
+        performance = loadScript(corefile, 120, 127);
+      }
+      else if ("WXE".equals(osver))
+      {
+        performance = loadScript(corefile, 108, 115);
+      }
       log(null, "INFO", "Carregando lista de comandos de ajustes do Office 365...");
       O365 = loadScript(corefile, 98, 103);
       log(null, "INFO", "Carregando lista de comandos de ativação do Windows..");
@@ -558,8 +565,8 @@ public class ImgPosInstFXMLController implements Initializable
       // Keep in mind that Files.readAllLines() reads first line as 0
       try
       {
-        server = Files.readAllLines(corefile.toPath()).get(569);
-        dom = Files.readAllLines(corefile.toPath()).get(564);
+        server = Files.readAllLines(corefile.toPath()).get(581);
+        dom = Files.readAllLines(corefile.toPath()).get(576);
       }
       catch (IOException ex)
       {
@@ -789,13 +796,13 @@ public class ImgPosInstFXMLController implements Initializable
         runCMD(performance);
         changeStatus("Configurando o Office 365...");
         runCMD(O365);
-        drvroot = new File("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + osver);
+        drvroot = new File("C:" + File.separator + "ImgPosInst" + File.separator + osver + File.separator + "DRV");
         if (installdrivers == true)
         {
           changeStatus("Listando drivers a serem instalados...");
           machinevalue = machinevalue.replaceAll("\\s+", "");
           log(null, "INFO", "Diretório de driver selecionado: " + machinevalue);
-          File drvdir = new File(drvroot + File.separator + "DRV" + File.separator + machinevalue);
+          File drvdir = new File(drvroot + File.separator + machinevalue);
           zipdrvfile = new File(drvdir + File.separator + "zip.zip");
           ZipFile zipdrv = new ZipFile(drvdir + File.separator + "zip.zip");
           changeStatus("Descompactando os arquivos necessários...");
@@ -842,7 +849,7 @@ public class ImgPosInstFXMLController implements Initializable
           log(null, "INFO", "Hostname atribuído pelo Sistema Operacional: " + oldhostname);
           ProcessBuilder sn = new ProcessBuilder("cmd", "/c", "wmic bios get serialnumber");
           hostsuffix = IOUtils.toString(sn.start().getInputStream(), "UTF-8");
-          File hostsuffixfile = new File("C:" + File.separator + "ImgPosInst" + File.separator + "src" + File.separator + "core" + File.separator + "sn.exp");
+          File hostsuffixfile = new File("C:" + File.separator + "ImgPosInst" + File.separator + "sn.exp");
           FileUtils.writeStringToFile(hostsuffixfile, hostsuffix, "UTF-8");
           List<String> hostcontents = FileUtils.readLines(hostsuffixfile, "UTF-8");
           String[] hostarray = new String[hostcontents.size()];
@@ -887,7 +894,7 @@ public class ImgPosInstFXMLController implements Initializable
               }
             });
           }
-          Process p = Runtime.getRuntime().exec("cmd /c powershell.exe 'C:\\ImgPosInst\\src\\core\\core.ps1'");
+          Process p = Runtime.getRuntime().exec("cmd /c powershell.exe 'C:\\ImgPosInst\\core.ps1'");
           int exit = p.exitValue();
           if (exit == 0)
           {

@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 /**
  * @author Daniel Augusto Monteiro de Almeida
  * @since 27/05/2019
- * @version 2.0.0-20191024-9
+ * @version 2.0.1-20191025-10
  *
  * Main Class. Initializes Controller.
  */
@@ -36,7 +36,7 @@ public class ImgPosInst extends Application
   @Override
   public void start(Stage stage) throws Exception
   {
-    String version = Files.readAllLines(corefile.toPath()).get(574);
+    String version = Files.readAllLines(corefile.toPath()).get(587);
     Parent root = FXMLLoader.load(getClass().getResource("ImgPosInstFXML.fxml"));
     Scene scene = new Scene(root);
     stage.setScene(scene);

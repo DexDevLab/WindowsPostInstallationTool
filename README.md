@@ -84,8 +84,13 @@ In main Controller:
  remotely a ps1 file who adds machine to Domain;
  -Changing ProcessBuilder() from main command (runCMD(List<String> list)) by Runtime.getRuntime().exec();
  -Removed Thread.sleep from various lines (trusting in Process.wait() to interrupt thread;
- -Program version now in Window Title;
+ -Program version now in Window Title
+ -------------------------
+ v2.0.1-20191025-27
  
+-Changed folder struture
+-Fixed apply.bat for Windows 7
+-Added specific performance tweaks for Windows 7
  
 
 
