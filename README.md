@@ -26,10 +26,10 @@
  This file just have 1 command line for DOS. Again, I'll change it (probably to a single JSON
  file containing all the commands, who will be deployed one at a time).
  
- In FerramentaDePosInstalacaoDeImagem\localresources I left a simulation of file structure and
+ In FerramentaDePosInstalacaoDeImagem\example I left a example of file structure and
  folder who will receive the resources that are vital to the program.
  In D:\Dropbox\DEV\Coding\Git\Repositories\Windows-Post-Installation-Tool
- \FerramentaDePosInstalacaoDeImagem\localresources\C\ImgPosInst\src\core\DRV\W7E\DellLatitude3470
+ \FerramentaDePosInstalacaoDeImagem\example\C\ImgPosInst\src\core\DRV\W7E\DellLatitude3470
  I left a template for the zip file containing the drivers. You can assume all other folders must
  have a zip file just like that.
 
@@ -49,7 +49,7 @@
  05 / 27 / 2019
  
  Project creation.
- -------------------------
+ ----------------------------------------------------------------------------------------
  08 / 28 / 2019
  
  Project Publishing. Program is funcional.
@@ -61,6 +61,30 @@
  correctly;
  -Discovering why NETDOM doesn't validate computer into Domain (a possible Windows
  incompatibility?).
+ -----------------------------------------------------------------------------------------
+ 10 / 16 / 2019
+ 
+ -Exclusion of unused scripts and files.
+ -Creation of a single file (not JSON yet, but better than nothing) called core.cfg.
+ -----------------------------------------------------------------------------------------
+ 10 / 17 / 2019
+ 
+ -Alteration in core.cfg and apply.bat for both versions of OSes.
+In main Controller:
+-New method for load script file
+-New method for execute commands by script line
+-New command for installing independent video driver
+-Excluded commanding for delete temporary files and included into initialization windows batch (apply.bat)
+-Method doCommands() removed
+ -------------------------
+ 10 / 25 / 2019
+ 
+ Still don't know why video drivers wasnt being installed correctly using batch command.
+ -Now program uses Powershell with -Invoke and -Credentials to connect a Admin capable machine and run
+ remotely a ps1 file who adds machine to Domain;
+ -Changing ProcessBuilder() from main command (runCMD(List<String> list)) by Runtime.getRuntime().exec();
+ -Removed Thread.sleep from various lines (trusting in Process.wait() to interrupt thread;
+ -Program version now in Window Title;
  
  
 
