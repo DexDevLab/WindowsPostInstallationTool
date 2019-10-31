@@ -39,7 +39,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 /**
  * @author Daniel Augusto Monteiro de Almeida
  * @since 07/25/2019
- * @version 2.0.1-20191025-27
+ * @version 3.0.0-20191031-32
  *
  * Main Class. Implements interface.
  */
@@ -89,18 +89,18 @@ public class ImgPosInstFXMLController implements Initializable
   //------------------------------------------------------------------
   // List variables containing corefile entries
   //------------------------------------------------------------------
-  List<String> machinetypelist; //Machines type List
-  List<String> machinelist; //Machines model list
-  List<String> sitelist; //Site list
-  List<String> IPs; //IP Address list for Domain connection test
-  List<String> SEPlist; //SEP Antivirus commands list
-  List<String> powerplan; //Power Plan adjust commands list
-  List<String> services; //Services tweaks commands list
-  List<String> remotecon; //Remote Connection adjust list
-  List<String> winstore; //Windows Store command list
-  List<String> performance; //General tweaks command list
-  List<String> O365; //Office 365 ajusts command list
-  List<String> activation; //Windows Activation commands
+  List<String> machinetypelist =  new ArrayList<>(); //Machines type List
+  List<String> machinelist =  new ArrayList<>(); //Machines model list
+  List<String> sitelist =  new ArrayList<>(); //Site list
+  List<String> IPs =  new ArrayList<>(); //IP Address list for Domain connection test
+  List<String> SEPlist =  new ArrayList<>(); //SEP Antivirus commands list
+  List<String> powerplan =  new ArrayList<>(); //Power Plan adjust commands list
+  List<String> services =  new ArrayList<>(); //Services tweaks commands list
+  List<String> remotecon =  new ArrayList<>(); //Remote Connection adjust list
+  List<String> winstore =  new ArrayList<>(); //Windows Store command list
+  List<String> performance =  new ArrayList<>(); //General tweaks command list
+  List<String> O365 =  new ArrayList<>(); //Office 365 ajusts command list
+  List<String> activation =  new ArrayList<>(); //Windows Activation commands
 
   /**
    * Driver files root directory.
@@ -323,15 +323,16 @@ public class ImgPosInstFXMLController implements Initializable
   /**
    * Load a defined Script File and put values into a list, choosing the line ranges.
    *
+   * @param lis - the list to write into
    * @param scriptfil - the script file
    * @param startlin  - the first line to read. In file, line 2 means startlin = 2
    * @param endlin    - the last line to read. For single line reading, use in endlin the same value as startlin
    *
-   * @return lis - the list from File data
    */
-  public List<String> loadScript(File scriptfil, int startlin, int endlin)
+  public void loadScript(List lis, File scriptfil, int startlin, int endlin)
   {
-    List<String> lis = null;
+    startlin--;
+    endlin--;
     while (startlin <= endlin)
     {
       try
@@ -344,7 +345,6 @@ public class ImgPosInstFXMLController implements Initializable
       }
       startlin++;
     }
-    return lis;
   }
 
   /**
@@ -461,9 +461,7 @@ public class ImgPosInstFXMLController implements Initializable
     }
     else
     {
-      {
-        log(null, "ERRO", a + " \"" + source.toString() + "\" NÃO FOI ENCONTRADO.");
-      }
+      log(null, "ERRO", a + " \"" + source.toString() + "\" NÃO FOI ENCONTRADO.");
     }
   }
 
@@ -510,63 +508,63 @@ public class ImgPosInstFXMLController implements Initializable
     {
       log(null, "INFO", "Registrando variáveis de acordo com o Corefile...");
       log(null, "INFO", "Carregando lista de tipos de equipamento...");
-      machinetypelist = loadScript(corefile, 70, 71);
+      loadScript(machinetypelist, corefile, 70, 71);
       log(null, "INFO", "Carregando lista de modelos de equipamento...");
-      machinelist = loadScript(corefile, 75, 83);
+      loadScript(machinelist, corefile, 75, 83);
       log(null, "INFO", "Carregando lista de Unidades Lactalis...");
-      sitelist = loadScript(corefile, 14, 65);
+      loadScript(sitelist, corefile, 14, 65);
       log(null, "INFO", "Carregando lista de Endereços IP para teste de rede...");
-      IPs = loadScript(corefile, 572, 572);
+      loadScript(IPs, corefile, 579, 579);
       log(null, "INFO", "Carregando lista de comandos SEP...");
-      SEPlist = loadScript(corefile, 567, 567);
+      loadScript(SEPlist, corefile, 574, 574);
       log(null, "INFO", "Carregando lista de comandos de ajuste de Perfil de Energia...");
       if ("W7E".equals(osver))
       {
-        powerplan = loadScript(corefile, 139, 196);
+        loadScript(powerplan, corefile, 146, 203);
       }
       else if ("WXE".equals(osver))
       {
-        powerplan = loadScript(corefile, 132, 134);
+        loadScript(powerplan, corefile, 132, 141);
       }
       log(null, "INFO", "Carregando lista de comandos de ajustes dos Serviços do Windows...");
       if ("W7E".equals(osver))
       {
-        services = loadScript(corefile, 410, 557);
+        loadScript(services, corefile, 417, 564);
       }
       else if ("WXE".equals(osver))
       {
-        services = loadScript(corefile, 206, 405);
+        loadScript(services, corefile, 213, 412);
       }
       log(null, "INFO", "Carregando lista de comandos de ajustes para Conexão remota...");
-      remotecon = loadScript(corefile, 201, 201);
+      loadScript(remotecon, corefile, 208, 208);
       log(null, "INFO", "Carregando lista de comandos de ajustes para a Windows Store...");
-      winstore = loadScript(corefile, 562, 562);
+      loadScript(winstore, corefile, 569, 569);
       log(null, "INFO", "Carregando lista de comandos de ajustes de performance...");
       if ("W7E".equals(osver))
       {
-        performance = loadScript(corefile, 120, 127);
+        loadScript(performance, corefile, 120, 127);
       }
       else if ("WXE".equals(osver))
       {
-        performance = loadScript(corefile, 108, 115);
+        loadScript(performance, corefile, 108, 115);
       }
       log(null, "INFO", "Carregando lista de comandos de ajustes do Office 365...");
-      O365 = loadScript(corefile, 98, 103);
+      loadScript(O365, corefile, 98, 103);
       log(null, "INFO", "Carregando lista de comandos de ativação do Windows..");
       if ("W7E".equals(osver))
       {
-        activation = loadScript(corefile, 93, 93);
+        loadScript(activation, corefile, 93, 93);
       }
       else if ("WXE".equals(osver))
       {
-        activation = loadScript(corefile, 88, 88);
+        loadScript(activation, corefile, 88, 88);
       }
       log(null, "INFO", "Carregando informações do Domínio...");
       // Keep in mind that Files.readAllLines() reads first line as 0
       try
       {
-        server = Files.readAllLines(corefile.toPath()).get(581);
-        dom = Files.readAllLines(corefile.toPath()).get(576);
+        server = Files.readAllLines(corefile.toPath()).get(588);
+        dom = Files.readAllLines(corefile.toPath()).get(583);
       }
       catch (IOException ex)
       {
@@ -604,7 +602,6 @@ public class ImgPosInstFXMLController implements Initializable
         {
           machinetag = "N";
         }
-        System.out.println(machinetag);
         comboboxmachine.setDisable(false);
       }
     });
@@ -646,9 +643,6 @@ public class ImgPosInstFXMLController implements Initializable
         else
         {
           hostprefix = "Nenhum";
-          {
-            log(null, "INFO", "Não foi escolhida uma Unidade/Site");
-          }
         }
         log(null, "INFO", "Unidade \"" + sitevalue + "\" de ID " + new_value.intValue() + " selecionada");
         buttoniniciar.setDisable(false);
