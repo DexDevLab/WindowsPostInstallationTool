@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,6 +23,7 @@ import java.util.concurrent.FutureTask;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -256,7 +258,7 @@ public class ImgPosInstFXMLController implements Initializable
    * @throws IOException in a common failure
    */
   @FXML
-  void acaobuttoniniciar() throws IOException
+  void acaobuttoniniciar()
   {
     log(null, "INFO", "Botão pressionado");
 
@@ -277,7 +279,7 @@ public class ImgPosInstFXMLController implements Initializable
     {
       log(null, "ERRO", "USUÁRIO OU SENHA NULOS OU INVÁLIDOS.");
       message = "nocredentials";
-      FutureTask<String> nocredentials = new FutureTask<>(new Dialog());
+      FutureTask nocredentials = new FutureTask<>(new Dialog());
       Platform.runLater(nocredentials);
       textfielduser.setDisable(false);
       passwordfieldpass.setDisable(false);
@@ -468,8 +470,8 @@ public class ImgPosInstFXMLController implements Initializable
   /**
    * Initialization method.
    *
-   * @param url
-   * @param rb
+   * @param url sem informação.
+   * @param rb sem informação.
    */
   @Override
   public void initialize(URL url, ResourceBundle rb)
@@ -477,10 +479,10 @@ public class ImgPosInstFXMLController implements Initializable
     log(null, "INFO", "Logger inicializado. Janela aberta.");
     log(null, "INFO", "Checando Sistema Operacional...");
     ProcessBuilder os = new ProcessBuilder("cmd", "/c", "ver");
-    String osget = null;
+    String osget = "";
     try
     {
-      osget = IOUtils.toString(os.start().getInputStream(), "UTF-8");
+      osget = IOUtils.toString(os.start().getInputStream(), StandardCharsets.UTF_8);
     }
     catch (IOException ex)
     {
@@ -586,69 +588,51 @@ public class ImgPosInstFXMLController implements Initializable
 
     comboboxmachinetype.getItems().addAll(machinetypelist);
 
-    comboboxmachinetype.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>()
-    {
-
-      @Override
-      public void changed(ObservableValue ov, Number value, Number new_value)
+    comboboxmachinetype.getSelectionModel().selectedIndexProperty().addListener((ov, value, new_value) -> {
+      machinetype = comboboxmachinetype.getItems().get((int) new_value);
+      log(null, "INFO", "Tipo de Equipamento \"" + machinetype + "\" de ID " + new_value.intValue() + " selecionado");
+      if (new_value.intValue() == 0)
       {
-        machinetype = comboboxmachinetype.getItems().get((int) new_value);
-        log(null, "INFO", "Tipo de Equipamento \"" + machinetype + "\" de ID " + new_value.intValue() + " selecionado");
-        if (new_value.intValue() == 0)
-        {
-          machinetag = "D";
-        }
-        else if (new_value.intValue() == 1)
-        {
-          machinetag = "N";
-        }
-        comboboxmachine.setDisable(false);
+        machinetag = "D";
       }
+      else if (new_value.intValue() == 1)
+      {
+        machinetag = "N";
+      }
+      comboboxmachine.setDisable(false);
     });
 
     comboboxmachine.getItems().addAll(machinelist);
-    comboboxmachine.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>()
-    {
-
-      @Override
-      public void changed(ObservableValue ov, Number value, Number new_value)
+    comboboxmachine.getSelectionModel().selectedIndexProperty().addListener((ov, value, new_value) -> {
+      machinevalue = comboboxmachine.getItems().get((int) new_value);
+      log(null, "INFO", "Equipamento \"" + machinevalue + "\" de ID " + new_value.intValue() + " selecionado");
+      if ((new_value.intValue()) == 0)
       {
-        machinevalue = comboboxmachine.getItems().get((int) new_value);
-        log(null, "INFO", "Equipamento \"" + machinevalue + "\" de ID " + new_value.intValue() + " selecionado");
-        if ((new_value.intValue()) == 0)
-        {
-          installdrivers = false;
-        }
-        comboboxsite.setDisable(false);
+        installdrivers = false;
       }
+      comboboxsite.setDisable(false);
     });
 
     comboboxsite.getItems().addAll(sitelist);
-    comboboxsite.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>()
-    {
-
-      @Override
-      public void changed(ObservableValue ov, Number value, Number new_value)
+    comboboxsite.getSelectionModel().selectedIndexProperty().addListener((ov, value, new_value) -> {
+      sitevalue = comboboxsite.getItems().get((int) new_value);
+      if (sitevalue.contains("("))
       {
-        sitevalue = comboboxsite.getItems().get((int) new_value);
-        if (sitevalue.contains("("))
+        int startIndex1 = sitevalue.indexOf("(");
+        int endIndex1 = sitevalue.indexOf(")");
+        hostprefix = sitevalue.substring(startIndex1 + 1, endIndex1);
         {
-          int startIndex1 = sitevalue.indexOf("(");
-          int endIndex1 = sitevalue.indexOf(")");
-          hostprefix = sitevalue.substring(startIndex1 + 1, endIndex1);
-          {
-            log(null, "INFO", "Prefixo da Unidade/Site: " + hostprefix);
-          }
+          log(null, "INFO", "Prefixo da Unidade/Site: " + hostprefix);
         }
-        else
-        {
-          hostprefix = "Nenhum";
-        }
-        log(null, "INFO", "Unidade \"" + sitevalue + "\" de ID " + new_value.intValue() + " selecionada");
-        buttoniniciar.setDisable(false);
-        textfielduser.setDisable(false);
-        passwordfieldpass.setDisable(false);
       }
+      else
+      {
+        hostprefix = "Nenhum";
+      }
+      log(null, "INFO", "Unidade \"" + sitevalue + "\" de ID " + new_value.intValue() + " selecionada");
+      buttoniniciar.setDisable(false);
+      textfielduser.setDisable(false);
+      passwordfieldpass.setDisable(false);
     });
 
     log(null, "INFO", "Checando conexão com o Domínio...");
@@ -663,11 +647,11 @@ public class ImgPosInstFXMLController implements Initializable
         log(ex, "ERRO", "EXCEÇÃO EM initialize(URL, ResourceBundle) - NÃO FOI POSSÍVEL REALIZAR O TESTE DE REDE COM O ENDEREÇO " + list);
       }
     });
-    if (domainconnected == false)
+    if (!domainconnected)
     {
       message = "nonetwork";
       log(null, "ERRO", "NÃO HÁ CONEXÃO DE REDE OU O DOMÍNIO NÃO PODE SER ACESSADO.");
-      FutureTask<String> nonetwork = new FutureTask<>(new Dialog());
+      FutureTask nonetwork = new FutureTask<>(new Dialog());
       Platform.runLater(nonetwork);
     }
   }
@@ -694,7 +678,7 @@ public class ImgPosInstFXMLController implements Initializable
    * @throws UnknownHostException when the address can not be reached
    * @return false when there is not connection with IP
    */
-  public boolean testConnect(String ip) throws UnknownHostException, IOException
+  public boolean testConnect(String ip) throws IOException
   {
     InetAddress iptest = InetAddress.getByName(ip);
     log(null, "INFO", "Testando conexão com o endereço IP " + ip + "...");
@@ -718,17 +702,14 @@ public class ImgPosInstFXMLController implements Initializable
   {
 
     @Override
-    public Dialog call() throws Exception
+    public Dialog call()
     {
       Alert dialog = new Alert(Alert.AlertType.ERROR);
       dialog.initModality(Modality.APPLICATION_MODAL);
       Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
       stage.setAlwaysOnTop(true);
       stage.getIcons().add(new Image(ImgPosInst.class.getResourceAsStream("icon1.jpg")));
-      stage.setOnCloseRequest((e) ->
-      {
-        e.consume();
-      });
+      stage.setOnCloseRequest(Event::consume);
       if ("nonetwork".equals(message))
       {
         dialog.setTitle("Erro de Conexão de Rede");
@@ -791,7 +772,7 @@ public class ImgPosInstFXMLController implements Initializable
         changeStatus("Configurando o Office 365...");
         runCMD(O365);
         drvroot = new File("C:" + File.separator + "ImgPosInst" + File.separator + osver + File.separator + "DRV");
-        if (installdrivers == true)
+        if (installdrivers)
         {
           changeStatus("Listando drivers a serem instalados...");
           machinevalue = machinevalue.replaceAll("\\s+", "");
@@ -808,7 +789,7 @@ public class ImgPosInstFXMLController implements Initializable
             FileIOAndLog("copiado", new File(drvroot + File.separator + "DRV" + File.separator + "pnputil.exe"), new File(drvdir + File.separator + "pnputil.exe"));
             FileIOAndLog("copiado", new File(drvroot + File.separator + "DRV" + File.separator + "drv.bat"), new File(drvdir + File.separator + "drv.bat"));
           }
-          catch (IOException ex){}
+          catch (IOException ignored){}
           Process p = Runtime.getRuntime().exec("START /WAIT CMD /C '" + drvdir.toString() + "\\drv.bat >NUL'");
           int exitp = p.exitValue();
           p.waitFor();
@@ -835,14 +816,14 @@ public class ImgPosInstFXMLController implements Initializable
         Thread.sleep(500);
         changeStatus("Ativando o Windows...");
         runCMD(activation);
-        if (domainconnected == true)
+        if (domainconnected)
         {
           log(null, "INFO", "Verificando Hostname atual...");
           ProcessBuilder host = new ProcessBuilder("cmd", "/c", "hostname");
-          oldhostname = IOUtils.toString(host.start().getInputStream(), "UTF-8");
+          oldhostname = IOUtils.toString(host.start().getInputStream(), StandardCharsets.UTF_8);
           log(null, "INFO", "Hostname atribuído pelo Sistema Operacional: " + oldhostname);
           ProcessBuilder sn = new ProcessBuilder("cmd", "/c", "wmic bios get serialnumber");
-          hostsuffix = IOUtils.toString(sn.start().getInputStream(), "UTF-8");
+          hostsuffix = IOUtils.toString(sn.start().getInputStream(), StandardCharsets.UTF_8);
           File hostsuffixfile = new File("C:" + File.separator + "ImgPosInst" + File.separator + "sn.exp");
           FileUtils.writeStringToFile(hostsuffixfile, hostsuffix, "UTF-8");
           List<String> hostcontents = FileUtils.readLines(hostsuffixfile, "UTF-8");
@@ -908,7 +889,7 @@ public class ImgPosInstFXMLController implements Initializable
       {
         log(x, "ERRO", "THREAD INTERROMPIDA");
       }
-      catch (IOException | ZipException ex) {}
+      catch (IOException | ZipException ignored) {}
     }
 
   }
