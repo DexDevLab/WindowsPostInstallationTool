@@ -49,48 +49,57 @@
  05 / 27 / 2019
  
  Project creation.
+ 
  ----------------------------------------------------------------------------------------
  08 / 28 / 2019
  
  Project Publishing. Program is funcional.
+ 
  Next Steps: 
- -Create a JSON file containing script information for ComboBox listing, CMD
+ 
+ - Create a JSON file containing script information for ComboBox listing, CMD
  commands etc and use it efficiently in program;
- -Revalidate commands by text instead of using bat file;
- -Discovering why Intel HD Graphics is the only driver who isn't being installed
+ - Revalidate commands by text instead of using bat file;
+ - Discovering why Intel HD Graphics is the only driver who isn't being installed
  correctly;
- -Discovering why NETDOM doesn't validate computer into Domain (a possible Windows
- incompatibility?).
+ - Discovering why NETDOM doesn't validate computer into Domain (a possible Windows
+ incompatibility?)
+ 
  -----------------------------------------------------------------------------------------
  10 / 16 / 2019
  
- -Exclusion of unused scripts and files.
- -Creation of a single file (not JSON yet, but better than nothing) called core.cfg.
+ - Exclusion of unused scripts and files.
+ - Creation of a single file (not JSON yet, but better than nothing) called core.cfg.
+ 
  -----------------------------------------------------------------------------------------
  10 / 17 / 2019
  
- -Alteration in core.cfg and apply.bat for both versions of OSes.
+ - Alteration in core.cfg and apply.bat for both versions of OSes.
+ 
 In main Controller:
--New method for load script file
--New method for execute commands by script line
--New command for installing independent video driver
--Excluded commanding for delete temporary files and included into initialization windows batch (apply.bat)
--Method doCommands() removed
+
+- New method for load script file
+- New method for execute commands by script line
+- New command for installing independent video driver
+- Excluded commanding for delete temporary files and included into initialization windows batch (apply.bat)
+- Method doCommands() removed
+
  -------------------------
  10 / 25 / 2019
  
  Still don't know why video drivers wasnt being installed correctly using batch command.
- -Now program uses Powershell with -Invoke and -Credentials to connect a Admin capable machine and run
+ 
+ - Now program uses Powershell with -Invoke and -Credentials to connect a Admin capable machine and run
  remotely a ps1 file who adds machine to Domain;
- -Changing ProcessBuilder() from main command (runCMD(List<String> list)) by Runtime.getRuntime().exec();
- -Removed Thread.sleep from various lines (trusting in Process.wait() to interrupt thread;
- -Program version now in Window Title
+ - Changing ProcessBuilder() from main command (runCMD(List<String> list)) by Runtime.getRuntime().exec();
+ - Removed Thread.sleep from various lines (trusting in Process.wait() to interrupt thread;
+ - Program version now in Window Title
  -------------------------
  v2.0.1-20191025-27
  
--Changed folder struture
--Fixed apply.bat for Windows 7
--Added specific performance tweaks for Windows 7
+- Changed folder struture
+- Fixed apply.bat for Windows 7
+- Added specific performance tweaks for Windows 7
  
 
 
