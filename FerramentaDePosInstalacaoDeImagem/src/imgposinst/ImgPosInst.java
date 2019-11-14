@@ -18,14 +18,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javax.swing.JOptionPane;
 
 /**
  * @author Daniel Augusto Monteiro de Almeida
- * @since 27/05/2019
- * @version 3.0.0-20191031-15
+ * @since 07/25/2019
+ * @version 3.0.1-20191114-187
  *
- * Main Class. Initializes Controller.
+ * Application Class. Initializes Controller.
  */
 public class ImgPosInst extends Application
 {
@@ -48,7 +47,7 @@ public class ImgPosInst extends Application
     stage.setScene(scene);
     if (corefile.exists())
     {
-      String version = Files.readAllLines(corefile.toPath()).get(593);
+      String version = Files.readAllLines(corefile.toPath()).get(588);
       stage.setTitle("Ferramenta de Pós-Instalação de Imagem " + version);
     }
     else
@@ -62,6 +61,7 @@ public class ImgPosInst extends Application
     {
       FutureTask<String> closerequest = new FutureTask<>(new CloseRequest());
       Platform.runLater(closerequest);
+      e.consume();
     });
     stage.show();
   }
@@ -73,12 +73,10 @@ public class ImgPosInst extends Application
     @Override
     public CloseRequest call()
     {
-      Alert closerequest = new Alert(Alert.AlertType.CONFIRMATION);
+      Alert closerequest = new Alert(Alert.AlertType.WARNING,"",ButtonType.YES, ButtonType.NO);
       closerequest.initModality(Modality.APPLICATION_MODAL);
       Stage stage = (Stage) closerequest.getDialogPane().getScene().getWindow();
       stage.getIcons().add(new Image(ImgPosInst.class.getResourceAsStream("icon1.jpg")));
-      stage.setOnCloseRequest((e) -> {e.consume();});
-      closerequest.getButtonTypes().clear();
       closerequest.setTitle("Fechar");
       closerequest.setHeaderText("");
       closerequest.setContentText("Deseja realmente fechar a Ferramenta de Pós-instalação de Imagem?\n\n"
@@ -88,13 +86,9 @@ public class ImgPosInst extends Application
                                   + "* Os drivers não serão instalados\n"
                                   + "* A máquina não será ingressa ao Domínio\n\n"
                                   + "Tem certeza que deseja fazer isso manualmente ao fechar o programa?");
-      ButtonType btnsim1 = new ButtonType("Sim");
-      closerequest.getButtonTypes().add(btnsim1);
-      ButtonType btnnao1 = new ButtonType("Não");
-      closerequest.getButtonTypes().add(btnnao1);
       ((Stage) closerequest.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);
       Optional<ButtonType> result = closerequest.showAndWait();
-      if (result.get() == btnsim1)
+      if (result.get() == ButtonType.YES)
       {
         System.exit(0);
       }
@@ -103,33 +97,10 @@ public class ImgPosInst extends Application
 
   }
 
-
   /**
    * Método Main.
    *
    * @param args
    */
-  public static void main(String[] args)
-  {
-    while (!corefile.exists())
-    {
-      JOptionPane.showOptionDialog
-        (null,
-          "Os arquivos de recurso necessários para "
-            + "a Ferramenta de Pós-instalação de "
-            + "Imagem não foram encontrados em "
-            + "\"C:\\ImgPosInst\". \n"
-            + "Copie o diretório \"ImgPosInst\" "
-            + "para a Unidade C: do Sistema e clique "
-            + "em \"OK\".",
-          "Recurso não encontrado",
-          JOptionPane.DEFAULT_OPTION,
-          JOptionPane.INFORMATION_MESSAGE,
-          null,
-          null,
-        null);
-    }
-    launch(args);
-  }
-
+  public static void main(String[] args) { launch(args); }
 }

@@ -23,15 +23,15 @@
             <Font size="14.0" />
          </font>
       </Button>
-      <ProgressIndicator fx:id="progressbar" layoutX="367.0" layoutY="466.0" prefHeight="61.0" prefWidth="66.0" />
-      <Label fx:id="labelstatus" alignment="CENTER" layoutX="137.0" layoutY="536.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="535.0" textAlignment="CENTER" wrapText="true">
+      <ProgressIndicator fx:id="progressbar" layoutX="367.0" layoutY="418.0" prefHeight="61.0" prefWidth="66.0" />
+      <Label fx:id="labelstatus" alignment="CENTER" layoutX="149.0" layoutY="485.0" minHeight="16" minWidth="69" prefHeight="31.0" prefWidth="503.0" textAlignment="CENTER" wrapText="true">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
       <ComboBox fx:id="comboboxmachine" layoutX="325.0" layoutY="55.0" prefHeight="25.0" prefWidth="150.0" />
       <ComboBox fx:id="comboboxsite" layoutX="521.0" layoutY="55.0" prefHeight="25.0" prefWidth="219.0" />
-      <Label fx:id="labelstatus2" alignment="CENTER" contentDisplay="CENTER" layoutX="45.0" layoutY="393.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="713.0" style="-fx-background-color: yellow;" text="NÃO DESLIGUE OU REINICIE O COMPUTADOR ATÉ O FIM DO PROCESSO." textAlignment="CENTER" textFill="#eb0909" visible="false" wrapText="true">
+      <Label fx:id="labelstatus2" alignment="CENTER" contentDisplay="CENTER" layoutX="44.0" layoutY="368.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="713.0" style="-fx-background-color: yellow;" text="NÃO DESLIGUE OU REINICIE O COMPUTADOR ATÉ O FIM DO PROCESSO." textAlignment="CENTER" textFill="#eb0909" visible="false" wrapText="true">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
@@ -59,5 +59,10 @@
          </font>
       </Label>
       <ComboBox fx:id="comboboxmachinetype" layoutX="87.0" layoutY="55.0" prefHeight="25.0" prefWidth="150.0" />
+      <Label fx:id="labelstatus3" alignment="CENTER" layoutX="43.0" layoutY="519.0" minHeight="16" minWidth="69" prefHeight="83.0" prefWidth="713.0" textAlignment="CENTER" wrapText="true">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>

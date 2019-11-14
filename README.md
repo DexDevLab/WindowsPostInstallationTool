@@ -2,7 +2,7 @@
  Application for custom adjust deployment to specific system environment.
 
 
-# Project Implementation Causes
+## Project Implementation Causes
 
  While working at IT Infrastructure, I discovered that System Customization is
  vital for production. Customize and personalize a System makes it more efficient
@@ -34,7 +34,7 @@
  have a zip file just like that.
 
  
-# Logbook
+## Logbook
 
  To be honest, I didn't find any problems in planning this project. At the beginning, I
  knew fast and easy everything I needed. The problem came when I faced the features.
@@ -46,12 +46,12 @@
  scripts or else I'll mess my System Configuration).
  
  
- 05 / 27 / 2019
+ ###### 05 / 27 / 2019
  
  Project creation.
  
  ----------------------------------------------------------------------------------------
- 08 / 28 / 2019
+ ###### 08 / 28 / 2019
  
  Project Publishing. Program is funcional.
  
@@ -66,13 +66,13 @@
  incompatibility?)
  
  -----------------------------------------------------------------------------------------
- 10 / 16 / 2019
+ ###### 10 / 16 / 2019
  
  - Exclusion of unused scripts and files.
  - Creation of a single file (not JSON yet, but better than nothing) called core.cfg.
  
  -----------------------------------------------------------------------------------------
- 10 / 17 / 2019
+ ###### 10 / 17 / 2019
  
  - Alteration in core.cfg and apply.bat for both versions of OSes.
  
@@ -85,7 +85,7 @@ In main Controller:
 - Method doCommands() removed
 
  -------------------------
- 10 / 25 / 2019
+ ###### 10 / 25 / 2019
  
  Still don't know why video drivers wasnt being installed correctly using batch command.
  
@@ -95,11 +95,64 @@ In main Controller:
  - Removed Thread.sleep from various lines (trusting in Process.wait() to interrupt thread;
  - Program version now in Window Title
  -------------------------
- v2.0.1-20191025-27
+ 
+ ###### v2.0.1-20191025-27
  
 - Changed folder struture
 - Fixed apply.bat for Windows 7
 - Added specific performance tweaks for Windows 7
+ -------------------------
+ 
+ ###### v3.0.1-20191114-187
+ 
+A bunch of changes here:
+
+In core.cfg:
+- Fixed bug when performance tweaks for 7 may program
+pause waiting for response in cmd because of lack of the
+"/f" parameter
+- Name of remote PC who will run PowerShell for join machine
+into domain isn't necessary, since a new form of joining it
+was implemented (below).
+
+In core.ps1:
+- Changed core.ps1 to change Hostname (using wmic wasn't working)
+and join to Domain soon after (seems unstable; if a machine was
+added, trying remove it from Domain and using core.ps1 seems not
+work).
+
+In apply.bat (W7E and WXE):
+- Fix bug which "ImgPosInst" folder wasnt deleted
+- Implemented a validation: If in last restart the machine wasnt
+joined in Domain, the techinitian will login into Administrator
+local account. Apply.bat will do the rest, running the core.ps1 again.
+
+In main package:
+- Created Class Exceptions to handle exceptions and errors, in order to
+show them to the techinitian during the process.
+
+In ImgPosInst.java:
+- The warning about the corefile (core.cfg) missing and the question for
+insert the resource folder was removed and implemented in a standalone program,
+called "Windows Post Installation Tool Starter"
+- Changed the alert type only for trying to make a better showing alert.
+
+In ImgPosInst.fxml:
+- Created a new label to serve as a status label about the progress detail.
+
+In ImgPosInstFXMLController.java:
+- Put boolean variables to lock the dialog messages (Idk the dialogs simply don'
+WAIT TO THE USER TO CLICK ON BUTTON!)
+- Created the label linkage (@FXML reference)
+- Transformed the Main Thread in a Main Task using Future Task.
+- Created a method (replaceInFile) to read the core.ps1 file and change the values of its
+variables accordingly.
+- Created Dialog Messages about the Domain Connection (now tested after main button pressed)
+and quit the program (now it is possible)
+- Created a method (isProcessOpen) to check whether SEP was installed already at machine or not
+(instead of simply waiting for x minutes to let the program run again)
+- Changed the code to run the cmd depending of the list in order to run in a separated Thread.
+- Created a separated Thread only for driver install.
  
 
 
