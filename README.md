@@ -17,14 +17,7 @@
  PS: I know MDT and WDS from Microsoft could do this in a more efficient way, but in my
  client circumstances, it's not possible.
  
- 
- The program resumes itself in "some steps who can perform and deploy DOS scripts". We can
- take the example with the "src/core/WXE/activation.cfg":
- 
- changepk.exe /ProductKey WXXXX-TXXXX-7XXXX-TXXXX-JXXXX
- 
- This file just have 1 command line for DOS. Again, I'll change it (probably to a single JSON
- file containing all the commands, who will be deployed one at a time).
+ The program resumes itself in "some steps who can perform and deploy DOS scripts".
  
  In FerramentaDePosInstalacaoDeImagem\example I left a example of file structure and
  folder who will receive the resources that are vital to the program.
@@ -141,7 +134,7 @@ In ImgPosInst.fxml:
 - Created a new label to serve as a status label about the progress detail.
 
 In ImgPosInstFXMLController.java:
-- Put boolean variables to lock the dialog messages (Idk the dialogs simply don'
+- Put boolean variables to lock the dialog messages (Idk the dialogs simply don't
 WAIT TO THE USER TO CLICK ON BUTTON!)
 - Created the label linkage (@FXML reference)
 - Transformed the Main Thread in a Main Task using Future Task.
@@ -153,7 +146,42 @@ and quit the program (now it is possible)
 (instead of simply waiting for x minutes to let the program run again)
 - Changed the code to run the cmd depending of the list in order to run in a separated Thread.
 - Created a separated Thread only for driver install.
+ -------------------------
  
+ ###### v4.0.0-20191204-242
+ 
+I created a Class for reading the Script File as a new format.
+You know, using line per line reading can be a bother, specially when removing some item from
+a part of list (the numbers change the order so isn't nice).
+That's why I created the Class ScriptFileReader, so I can read the Script File using brackets and
+dividing the lists in keywords.
+-------------------------
+ 
+ ###### v4.0.12-20200129-254
+ 
+I made a bunch of changes since last update, and gonna try to put them out here.
+
+- Added reg file to disable Windows Store, since it isn't disable by Windows Image (DISM) anymore.
+I decided make this since some apps (i. e., bankline applications) could be useful and needs to be
+installed but I want do avoid users installing games at the same time. So I created a reg file to
+Disable Windows Store and another regfile (isn't in the project) to undo this change.
+
+- Changed apply.bat (both Windows 7 and 10 versions) for to do not using a IF sentence to try to
+apply PowerShell Script again - if the machine doesn't integrate the Domain while the program running,
+the technitian need to do it by himself. Added a command from prevent Skype for Business open automatically
+at logon.
+
+- Removed version.txt file for both Windows versions. Unecessairy.
+
+- Created igxpin.bat, to install video driver using Intel Driver Installer (setup.exe / setup.msi), since upnputil
+wasn't working at all.
+
+- Fixed some bugs at warning message boxes. And I just don't know why some Alert Boxes just doesn't appear. I needed to
+use a Future Task with Platform RunLater and create a loop to lock main thread and this is disgusting, but I don't have any other options.
+Check ImgPosInstFXMLController, at lines 1063-1068.
+
+- Created a Dialog Box asking for system restart. This solves the problems when the Antivirus wasn't
+installed but the System is rebooting already.
 
 
 

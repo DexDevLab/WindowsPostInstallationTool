@@ -13,7 +13,6 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +20,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.Event;
@@ -101,6 +102,7 @@ public class ImgPosInstFXMLController implements Initializable
   List<String> performance =  new ArrayList<>(); //General tweaks command list
   List<String> O365 =  new ArrayList<>(); //Office 365 ajusts command list
   List<String> activation =  new ArrayList<>(); //Windows Activation commands
+  List<String> domlist =  new ArrayList<>(); //Domain list obj to retrieve from method
 
   /**
    * Driver files root directories.
@@ -259,7 +261,7 @@ public class ImgPosInstFXMLController implements Initializable
    * Object interface. Field to type technician password.
    */
   @FXML
-  private PasswordField passwordfieldpass;
+  private TextField textfieldpass;
 
   /**
    * Event for pressing "start" button.
@@ -285,10 +287,10 @@ public class ImgPosInstFXMLController implements Initializable
     labelstatus2.setVisible(true);
     labelstatus3.setVisible(true);
     textfielduser.setDisable(true);
-    passwordfieldpass.setDisable(true);
+    textfieldpass.setDisable(true);
 
     user = textfielduser.getText();
-    pass = passwordfieldpass.getText();
+    pass = textfieldpass.getText();
 
     if (user.isEmpty() | pass.isEmpty())
     {
@@ -296,7 +298,7 @@ public class ImgPosInstFXMLController implements Initializable
       dialogMessage("nocredentials");
 
       textfielduser.setDisable(false);
-      passwordfieldpass.setDisable(false);
+      textfieldpass.setDisable(false);
       buttoniniciar.setDisable(false);
     }
     else
@@ -335,31 +337,19 @@ public class ImgPosInstFXMLController implements Initializable
   }
 
   /**
-   * Load a defined Script File and put values into a list, choosing the line ranges.
+   * Load a defined Script File and put values into a list.
    *
-   * @param lis - the list to write into
-   * @param scriptfil - the script file
-   * @param startlin  - the first line to read. In file, line 2 means startlin = 2
-   * @param endlin    - the last line to read. For single line reading, use in endlin the same value as startlin
+   * @param category - the keyword to find as category
+   * @return lis - the output list
    *
    */
-  public void loadScript(List lis, File scriptfil, int startlin, int endlin)
+  public List<String> loadScript(String category)
   {
-    startlin--;
-    endlin--;
-    while (startlin <= endlin)
-    {
-      try
-      {
-        lis.add(Files.readAllLines(scriptfil.toPath()).get(startlin));
-      }
-      catch (IOException ex)
-      {
-        log(ex, "ERRO", "EXCEÇÃO EM loadScript(File, int, int): NÃO FOI POSSÍVEL INCLUIR A LINHA " + startlin + " NA LISTA.");
-        Platform.runLater(() -> { new Exceptions().treatException(ex);});
-      }
-      startlin++;
-    }
+    ScriptFileReader sfr = new ScriptFileReader();
+    sfr.readScript(corefile, true);
+    List<String> lis = new ArrayList<>();
+    lis = sfr.searchItemsFromCategory(category);
+    return lis;
   }
 
   /**
@@ -488,69 +478,63 @@ public class ImgPosInstFXMLController implements Initializable
     {
       log(null, "INFO", "Registrando variáveis de acordo com o Corefile...");
       log(null, "INFO", "Carregando lista de tipos de equipamento...");
-      loadScript(machinetypelist, corefile, 70, 71);
+      machinetypelist = loadScript("machineTypeList");
       log(null, "INFO", "Carregando lista de modelos de equipamento...");
-      loadScript(machinelist, corefile, 75, 83);
+      machinelist = loadScript("machineList");
       log(null, "INFO", "Carregando lista de Unidades Lactalis...");
-      loadScript(sitelist, corefile, 14, 65);
+      sitelist = loadScript("siteList");
       log(null, "INFO", "Carregando lista de Endereços IP para teste de rede...");
-      loadScript(IPs, corefile, 579, 579);
+      IPs = loadScript("iPs");
       log(null, "INFO", "Carregando lista de comandos SEP...");
-      loadScript(SEPlist, corefile, 574, 574);
+      SEPlist = loadScript("sEP");
       log(null, "INFO", "Carregando lista de comandos de ajuste de Perfil de Energia...");
       if ("W7E".equals(osver))
       {
-        loadScript(powerplan, corefile, 146, 203);
+        powerplan = loadScript("w7EPowerPlan");
       }
       else if ("WXE".equals(osver))
       {
-        loadScript(powerplan, corefile, 132, 141);
+        powerplan = loadScript("wXEPowerPlan");
       }
       log(null, "INFO", "Carregando lista de comandos de ajustes dos Serviços do Windows...");
       if ("W7E".equals(osver))
       {
-        loadScript(services, corefile, 417, 564);
+        services = loadScript("w7EServices");
       }
       else if ("WXE".equals(osver))
       {
-        loadScript(services, corefile, 213, 412);
+        services = loadScript("wXEServices");
       }
       log(null, "INFO", "Carregando lista de comandos de ajustes para Conexão remota...");
-      loadScript(remotecon, corefile, 208, 208);
+      remotecon = loadScript("remoteCon");
       log(null, "INFO", "Carregando lista de comandos de ajustes para a Windows Store...");
-      loadScript(winstore, corefile, 569, 569);
+      winstore = loadScript("winstore");
       log(null, "INFO", "Carregando lista de comandos de ajustes de performance...");
       if ("W7E".equals(osver))
       {
-        loadScript(performance, corefile, 120, 127);
+        performance = loadScript("w7EPerformance");
       }
       else if ("WXE".equals(osver))
       {
-        loadScript(performance, corefile, 108, 115);
+        performance = loadScript("wXEPerformance");
       }
       log(null, "INFO", "Carregando lista de comandos de ajustes do Office 365...");
-      loadScript(O365, corefile, 98, 103);
+        O365 = loadScript("o365Config");
       log(null, "INFO", "Carregando lista de comandos de ativação do Windows..");
       if ("W7E".equals(osver))
       {
-        loadScript(activation, corefile, 93, 93);
+        activation = loadScript("w7EActivation");
       }
       else if ("WXE".equals(osver))
       {
-        loadScript(activation, corefile, 88, 88);
+        activation = loadScript("wXEActivation");
       }
       log(null, "INFO", "Carregando informações do Domínio...");
-      // Keep in mind that Files.readAllLines() reads first line as 0,
-      // i.e., line 19 is .get(18).
-      try
+      domlist = loadScript("domain");
+      domlist.forEach((line2) ->
       {
-        dom = Files.readAllLines(corefile.toPath()).get(583);
-      }
-      catch (IOException ex)
-      {
-        log(ex, "ERRO", "EXCEÇÃO EM initialize(URL, ResourceBundle): NÃO FOI POSSÍVEL RECEBER AS INFORMAÇÕES DE DOMÍNIO DO ARQUIVO COREFILE.");
-        Platform.runLater(() -> { new Exceptions().treatException(ex);});
-      }
+        dom = line2;
+      });
       log(null, "INFO", "Todas as variáveis foram registradas com sucesso.");
     }
 
@@ -564,7 +548,7 @@ public class ImgPosInstFXMLController implements Initializable
     comboboxmachine.setTooltip(new Tooltip("Selecione de acordo com a Marca/Modelo do equipamento para realizar a instalação de Drivers."));
     comboboxmachinetype.setTooltip(new Tooltip("Selecione o tipo de Equipamento."));
     textfielduser.setTooltip(new Tooltip("Insira o ID do técnico autorizado."));
-    passwordfieldpass.setTooltip(new Tooltip("Insira a senha do técnico autorizado."));
+    textfieldpass.setTooltip(new Tooltip("Insira a senha do técnico autorizado."));
 
     comboboxmachinetype.getItems().addAll(machinetypelist);
 
@@ -611,7 +595,7 @@ public class ImgPosInstFXMLController implements Initializable
       log(null, "INFO", "Unidade \"" + sitevalue + "\" de ID " + new_value.intValue() + " selecionada");
       buttoniniciar.setDisable(false);
       textfielduser.setDisable(false);
-      passwordfieldpass.setDisable(false);
+      textfieldpass.setDisable(false);
     });
   }
 
@@ -722,10 +706,43 @@ public class ImgPosInstFXMLController implements Initializable
     }
   }
 
-
-  class MainJob extends Task<Integer>
+  class Ask2Restart implements Callable
   {
 
+    @Override
+    public Ask2Restart call()
+    {
+      Alert alrt = new Alert(Alert.AlertType.WARNING," ", ButtonType.YES, ButtonType.NO);
+      alrt.initModality(Modality.APPLICATION_MODAL);
+      Stage stage = (Stage) alrt.getDialogPane().getScene().getWindow();
+      stage.getIcons().add(new Image(ImgPosInstFXMLController.class.getResourceAsStream("icon1.jpg")));
+      alrt.setTitle("Procedimento Concluído");
+      alrt.setHeaderText("");
+      alrt.setContentText("Todos os procedimentos foram concluídos.\n"
+                                  + "Verfique se o antivírus foi instalado corretamente antes de confirmar.\n\n"
+                                  + "Deseja reiniciar o computador agora?");
+      ((Stage) alrt.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);
+      Optional<ButtonType> result = alrt.showAndWait();
+      if (result.get() == ButtonType.YES)
+      {
+        try
+        {
+          new ProcessBuilder("cmd", "/c", "shutdown -r -t 3").start();
+        }
+        catch (IOException ex)
+        {
+          log(ex, "ERRO", "ERRO AO INICIALIZAR O COMANDO DE REBOOT DA MÁQUINA");
+          Platform.runLater(() -> { new Exceptions().treatException(ex);});
+        }
+        System.exit(0);
+      }
+      return null;
+    }
+
+  }
+
+  public class MainJob extends Task<Integer>
+  {
     /**
      * Chama o método principal da Classe.
      * @see MainJob
@@ -937,11 +954,11 @@ public class ImgPosInstFXMLController implements Initializable
         Thread.sleep(500);
         changeStatus("Iniciando...");
         Thread.sleep(500);
-        if (!isProcessOpen("ccSvcHst.exe"))
+        if (!isProcessOpen("sepWscSvc64.exe"))
         {
           changeStatus("Instalando o Symantec Endpoint Protection. Aguarde...");
           runCMD(SEPlist);
-          while(!isProcessOpen("ccSvcHst.exe"))
+          while(!isProcessOpen("sepWscSvc64.exe"))
           {
             Thread.sleep(1000);
             changeStatus("Validando a Instalação do Antivírus. Aguarde...");
@@ -999,7 +1016,7 @@ public class ImgPosInstFXMLController implements Initializable
         Thread.sleep(500);
         changeStatus("Ativando o Windows...");
         runCMD(activation);
-        if (domainconnected)
+        if ((domainconnected) && (!"Nenhum".equals(hostprefix)))
         {
           log(null, "INFO", "Verificando Hostname atual...");
           ProcessBuilder host = new ProcessBuilder("cmd", "/c", "hostname");
@@ -1021,14 +1038,7 @@ public class ImgPosInstFXMLController implements Initializable
             }
           }
           log(null, "INFO", "Número de Série: " + hostsuffix);
-          if (!"Nenhum".equals(hostprefix))
-          {
-            hostname = (hostprefix + machinetag + hostsuffix);
-          }
-          else
-          {
-            hostname = "LACTALIS";
-          }
+          hostname = (hostprefix + machinetag + hostsuffix);
           log(null, "INFO", "Hostname: " + hostname);
           changeStatus("Alterando Hostname e Inserindo Máquina ao Domínio...");
           replaceInFile(pshellfile, "= \"HOSTNAME\"", "= \"" + hostname + "\"");
@@ -1041,7 +1051,7 @@ public class ImgPosInstFXMLController implements Initializable
         changeStatus("Concluindo...");
         Platform.runLater(() ->
         {
-          updateMessage("O programa irá reiniciar o computador automaticamente. Aguarde...");
+          updateMessage("");
         });
         Thread.sleep(5000);
         if (installdrivers == true)
@@ -1050,7 +1060,12 @@ public class ImgPosInstFXMLController implements Initializable
           new ProcessBuilder("C:/ImgPosInst/" + osver + "/DRV/" + machinevalue + "/video/igxpin.bat").start().waitFor();
           log(null, "INFO", "Driver de vídeo instalado com sucesso");
         }
-        new ProcessBuilder("cmd", "/c", "shutdown -r -t 3").start();
+        FutureTask<String> ask2restart = new FutureTask<>(new Ask2Restart());
+        Platform.runLater(ask2restart);
+        while(!ask2restart.isDone())
+        {
+          Thread.sleep(1000);
+        }
         log(null, "INFO", "Fechando o programa...");
         System.exit(0);
       }

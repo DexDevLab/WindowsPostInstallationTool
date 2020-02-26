@@ -4,7 +4,7 @@
 package imgposinst;
 
 import java.io.File;
-import java.nio.file.Files;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 /**
  * @author Daniel Augusto Monteiro de Almeida
  * @since 07/25/2019
- * @version 3.0.1-20191114-187
+ * @version 4.0.12-20200129-254
  *
  * Application Class. Initializes Controller.
  */
@@ -33,6 +33,8 @@ public class ImgPosInst extends Application
    * Corefile containing all info about UI and custom tweaks for the System.
    */
   static File corefile = new File("C:" + File.separator + "ImgPosInst" + File.separator + "core.cfg");
+  String version = "";
+
   /**
    * Método start.
    *
@@ -47,8 +49,14 @@ public class ImgPosInst extends Application
     stage.setScene(scene);
     if (corefile.exists())
     {
-      String version = Files.readAllLines(corefile.toPath()).get(588);
-      stage.setTitle("Ferramenta de Pós-Instalação de Imagem " + version);
+      ScriptFileReader sfr = new ScriptFileReader();
+      sfr.readScript(corefile, true);
+      List<String> vers = sfr.searchItemsFromCategory("appVers");
+      vers.forEach((line) ->
+      {
+        version = line;
+      });
+      stage.setTitle("Ferramenta de Pós-Instalação de Imagem " + version + " - Randstad Technologies do Brasil");
     }
     else
     {
@@ -65,7 +73,6 @@ public class ImgPosInst extends Application
     });
     stage.show();
   }
-
 
   class CloseRequest implements Callable
   {

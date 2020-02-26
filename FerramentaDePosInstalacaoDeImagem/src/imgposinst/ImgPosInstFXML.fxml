@@ -42,7 +42,7 @@
          </font>
       </Label>
       <TextField fx:id="textfielduser" alignment="CENTER" disable="true" layoutX="327.0" layoutY="210.0" />
-      <PasswordField fx:id="passwordfieldpass" alignment="CENTER" disable="true" layoutX="327.0" layoutY="273.0" />
+      <TextField fx:id="textfieldpass" alignment="CENTER" disable="true" layoutX="327.0" layoutY="273.0" />
       <Label alignment="CENTER" contentDisplay="CENTER" layoutX="345.0" layoutY="170.0" minHeight="16" minWidth="69" prefHeight="44.0" prefWidth="112.0" text="ID de Usuário" textAlignment="CENTER">
          <font>
             <Font name="System Bold" size="15.0" />
