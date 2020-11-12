@@ -15,14 +15,13 @@
  proper tweaks to machine.
  
  PS: I know MDT and WDS from Microsoft could do this in a more efficient way, but in my
- client circumstances, it's not possible.
+ client circumstances, it was not possible.
  
  The program resumes itself in "some steps who can perform and deploy DOS scripts".
  
  In FerramentaDePosInstalacaoDeImagem\example I left a example of file structure and
  folder who will receive the resources that are vital to the program.
- In D:\Dropbox\DEV\Coding\Git\Repositories\Windows-Post-Installation-Tool
- \FerramentaDePosInstalacaoDeImagem\example\C\ImgPosInst\src\core\DRV\W7E\DellLatitude3470
+ In example\C\ImgPosInst\src\core\DRV\W7E\DellLatitude3470
  I left a template for the zip file containing the drivers. You can assume all other folders must
  have a zip file just like that.
 
