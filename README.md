@@ -15,18 +15,19 @@
  proper tweaks to machine.
  
  PS: I know MDT and WDS from Microsoft could do this in a more efficient way, but in my
- client circumstances, it was not possible.
+ client circumstances, it's not possible.
  
  The program resumes itself in "some steps who can perform and deploy DOS scripts".
  
  In FerramentaDePosInstalacaoDeImagem\example I left a example of file structure and
  folder who will receive the resources that are vital to the program.
- In example\C\ImgPosInst\src\core\DRV\W7E\DellLatitude3470
+ In D:\Dropbox\DEV\Coding\Git\Repositories\Windows-Post-Installation-Tool
+ \FerramentaDePosInstalacaoDeImagem\example\C\ImgPosInst\src\core\DRV\W7E\DellLatitude3470
  I left a template for the zip file containing the drivers. You can assume all other folders must
  have a zip file just like that.
- 
 
-# Logbook
+ 
+## Logbook
 
  To be honest, I didn't find any problems in planning this project. At the beginning, I
  knew fast and easy everything I needed. The problem came when I faced the features.
@@ -36,15 +37,15 @@
  Obviously, that isn't what I want, and I will work in this project again to change it
  as soon as I have a dummy machine for experiments (I can't run some DOS commands from
  scripts or else I'll mess my System Configuration).
-
-
-## 05 / 27 / 2019
-
+ 
+ 
+ ###### 05 / 27 / 2019
+ 
  Project creation.
-
-
-## 08 / 28 / 2019
-
+ 
+ ----------------------------------------------------------------------------------------
+ ###### 08 / 28 / 2019
+ 
  Project Publishing. Program is funcional.
  
  Next Steps: 
@@ -56,14 +57,15 @@
  correctly;
  - Discovering why NETDOM doesn't validate computer into Domain (a possible Windows
  incompatibility?)
-
-
-## 10 / 16 / 2019
+ 
+ -----------------------------------------------------------------------------------------
+ ###### 10 / 16 / 2019
  
  - Exclusion of unused scripts and files.
  - Creation of a single file (not JSON yet, but better than nothing) called core.cfg.
-
-## 10 / 17 / 2019
+ 
+ -----------------------------------------------------------------------------------------
+ ###### 10 / 17 / 2019
  
  - Alteration in core.cfg and apply.bat for both versions of OSes.
  
@@ -75,7 +77,8 @@ In main Controller:
 - Excluded commanding for delete temporary files and included into initialization windows batch (apply.bat)
 - Method doCommands() removed
 
-## 10 / 25 / 2019
+ -------------------------
+ ###### 10 / 25 / 2019
  
  Still don't know why video drivers wasnt being installed correctly using batch command.
  
@@ -84,14 +87,16 @@ In main Controller:
  - Changing ProcessBuilder() from main command (runCMD(List<String> list)) by Runtime.getRuntime().exec();
  - Removed Thread.sleep from various lines (trusting in Process.wait() to interrupt thread;
  - Program version now in Window Title
-
-## v2.0.1-20191025-27
+ -------------------------
+ 
+ ###### v2.0.1-20191025-27
  
 - Changed folder struture
 - Fixed apply.bat for Windows 7
 - Added specific performance tweaks for Windows 7
-
-## v3.0.1-20191114-187
+ -------------------------
+ 
+ ###### v3.0.1-20191114-187
  
 A bunch of changes here:
 
@@ -141,14 +146,18 @@ and quit the program (now it is possible)
 (instead of simply waiting for x minutes to let the program run again)
 - Changed the code to run the cmd depending of the list in order to run in a separated Thread.
 - Created a separated Thread only for driver install.
-
-## v4.0.0-20191204-242
+ -------------------------
  
-I created a Class for reading the Script File as a new format. You know, using line per line reading can be a bother, specially when removing some item from a part of list (the numbers change the order so isn't nice). That's why I created the Class ScriptFileReader, so I can read the Script File using brackets and dividing the lists in keywords.
-
-
-## v4.0.12-20200129-254
-
+ ###### v4.0.0-20191204-242
+ 
+I created a Class for reading the Script File as a new format.
+You know, using line per line reading can be a bother, specially when removing some item from
+a part of list (the numbers change the order so isn't nice).
+That's why I created the Class ScriptFileReader, so I can read the Script File using brackets and
+dividing the lists in keywords.
+-------------------------
+ 
+ ###### v4.0.12-20200129-254
  
 I made a bunch of changes since last update, and gonna try to put them out here.
 
@@ -173,3 +182,6 @@ Check ImgPosInstFXMLController, at lines 1063-1068.
 
 - Created a Dialog Box asking for system restart. This solves the problems when the Antivirus wasn't
 installed but the System is rebooting already.
+
+
+
